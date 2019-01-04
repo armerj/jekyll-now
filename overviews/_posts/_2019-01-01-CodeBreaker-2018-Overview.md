@@ -64,3 +64,9 @@ For this task, the encryption key needs to be retrieved without paying the ranso
 This task continues the work from task 6, but now the ransom paid by the victims needs to be retrieved and returned. Only one line needs to be added to the contract from task 6, though understanding what to add is more difficult.  
 
 [Task 7 Writeup](https://armerj.github.io/CodeBreaker-2018-Task-7)
+
+# Suggestions to Fixing Escrow Vulnerabilities #
+
+The below link provides suggestions to harden the Escrow contract to prevent the attacks used in task 6 and task 7 to retrieve the decrypted encryption key and Ether.   
+
+[Escrow Contract Improvements](https://armerj.github.io/CodeBreaker-2018-Contract-Improvements)

@@ -4,17 +4,17 @@ permalink: /CodeBreaker-2018-Task-5/
 title: NSA Codebreaker 2018, Task 5
 ---
 
-Task 5 asks us to determine what IPs on 10.130.0.0/16 have been compromised, based on the victim ids we found in task 4. 
+Task 5 asks us to determine what IPs on 10.130.0.0/16 have been compromised, based on the victim ids found in task 4. 
 
 The TOTP that each contract originally used to for authentication needs to be found, otherwise there are 2^16 IP addresses and  10^6 TOTPs to check, 65,536,000,000 combinations. Below is the general flow when a victim is compromised, further details can be found [here](https://armerj.github.io/CodeBreaker-2018-Contract/).  
 
 ![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/contract/contract_deployment.png)
 
-Fortunately, we can take advantage of the way the Registry contract communicates with the off chain oracle. When a Ransom contract registers the Registry contract will emit an AuthEvent, step 5, for the off chain oracle to validate the provided arguments. Events emitted by a contract can be searched, allowing us to recover the TOTPs. 
+Fortunately, the way the Registry contract communicates with the off chain oracle can be taken advantage of. When a Ransom contract registers the Registry contract will emit an AuthEvent, step 5, for the off chain oracle to validate the provided arguments. Events emitted by a contract can be searched, allowing us to recover the TOTPs. 
 
 ![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_5/event_code.png)
 
-The Registry contract serves multiple Escrow contracts, so the blocks to check for events need to be limited. This can be done by looking at the last AuthCallbackEvent emitted by the Escrow Contract and only searching upto that block. 
+The Registry contract serves multiple Escrow contracts, so the blocks to check for events need to be limited. This can be done by looking at the last AuthCallbackEvent emitted by the Escrow Contract and only searching up to that block. 
 
 {% highlight python %}
 authCallback_filter = escrow.eventFilter('AuthCallbackEvent', {'fromBlock' : 0, 'toBlock' : 'latest'})
@@ -22,7 +22,7 @@ authCallback_events = authCallback_filter.get_all_entries()
 authCallback_events[12]
 {% endhighlight %}
 
-Now we can get all AuthEvents for block 0 to 13000. 
+Now all AuthEvents for block 0 to 13000 can be retrieved. 
 
 ![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_5/ransom_otps.png)
 

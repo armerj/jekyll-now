@@ -4,9 +4,9 @@ permalink: /CodeBreaker-2018-Task-3/
 title: NSA Codebreaker 2018, Task 3
 ---
 
-For task 3, we are asked to determine how the victim id is generated, in order to see if any information can be determined if we know just the victim id. 
+For task 3, the algorithm for generating the victim ID needs to be found, in order to see if any information can be determined if we know just the victim ID. 
 
-To aid in our effort to generate the victim id for the infected computer, we are provided with the following information:<br>
+To aid in our effort to generate the victim ID for the infected computer, we are provided with the following information:<br>
 ```JavaScript
 {
     "cpu_bits": "32",
@@ -20,7 +20,7 @@ To aid in our effort to generate the victim id for the infected computer, we are
 
 What is interesting, although irrelevant, about this information is that the operating system is Windows, though the binaries provided are for Linux. 
 
-To determine how the victim id is generated, the function _cid needs to be reversed. 
+To determine how the victim ID is generated, the function _cid needs to be reversed. 
 
 ![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_3/gia_otp.png)
 
@@ -30,12 +30,12 @@ The function _gia is called with a pointer to var_B8, which is then moved to var
 
 The value \<gia\>\<totp\> is used as the input for HMAC-SHA256 with the TOTP secret key as the key to the HMAC algorithm. 
 
-The next step is to determine what the function _gia returns. We know the return value is 4 bytes, since the TOTP was stored at *(var_98+4). I was not able to determine what the function does by Google, but I was able to determine what it likely returns based on the victim information provided and the return size. The value is 4 bytes long which is the same amount of bytes needed to represent the IPv4 address space. 
+The next step is to determine what the function _gia returns, after reversing I believe gia stands for get ip address. We know the return value is 4 bytes, since the TOTP was stored at *(var_98+4). I was not able to determine what the function does by Google, but I was able to determine what it likely returns based on the victim information provided and the return size. The value is 4 bytes long which is the same amount of bytes needed to represent the IPv4 address space. 
 
 To convert an IPv4 address to the int32 equivalent the following [formula](http://www.aboutmyip.com/AboutMyXApp/IP2Integer.jsp?ipAddress=10.118.138.237) can be used:<br>
 (first octet * 256³) + (second octet * 256²) + (third octet * 256) + (fourth octet).
 
-Below is the python script I used to generate the victim ID, that was provided in the orginal ransom note to validate that I had the format correct.
+Below is the python script I used to generate the victim ID, that was provided in the original ransom note to validate that I had the format correct.
 
 {% highlight python %}
 import M2Crypto

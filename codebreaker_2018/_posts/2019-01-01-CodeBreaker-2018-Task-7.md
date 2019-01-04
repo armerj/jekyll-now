@@ -4,7 +4,7 @@ permalink: /CodeBreaker-2018-Task-7/
 title: NSA Codebreaker 2018, Task 7
 ---
 
-For task 7, we need to find a way to retrieve the Ether victims have already paid and send it back to them. The vulnerability that makes this possible is in the Escrow contract; it will pass control to the Ransom contract allowing what is call [re-entrancy](https://solidity.readthedocs.io/en/latest/security-considerations.html#re-entrancy). Re-Entrancy is when a contract is able to call back into another contract to effect the state, before the transaction has been completed. The contract is written to protect itself from someone using re-entrancy to send themselves all the Ether directly, since it subtracts the amount before transferring the Ether. 
+For task 7 a way to retrieve the Ether victims have already paid and send it back to them is required. The vulnerability that makes this possible is in the Escrow contract; it will pass control to the Ransom contract allowing what is call [re-entrancy](https://solidity.readthedocs.io/en/latest/security-considerations.html#re-entrancy). Re-Entrancy is when a contract is able to call back into another contract to effect the state, before the transaction has been completed. The contract is written to protect itself from someone using re-entrancy to send themselves all the Ether directly, since it subtracts the amount before transferring the Ether. 
 
 ![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/request_refund.png)
 

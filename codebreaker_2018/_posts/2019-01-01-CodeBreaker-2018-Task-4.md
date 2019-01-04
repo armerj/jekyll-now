@@ -4,7 +4,7 @@ permalink: /CodeBreaker-2018-Task-4/
 title: NSA Codebreaker 2018, Task 4
 ---
 
-Task 4, is the first time that we need to interact with the smart contracts. 
+Task 4, is the first time that requires interaction with the blockchain. 
 
 [references for interacting with smart contracts]
 
