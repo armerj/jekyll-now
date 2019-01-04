@@ -58,7 +58,7 @@ Below are the steps for this:<br>
 
 If the Escrow contract has enough Ether to cover the ransom amount, then the above attack can be changed to protect the attacker from having Ether tied up on any unsuccessful attempts. Instead of sending an encrypted file that will be successful, the attacker can send one that will cause the decryption to fail; the rest of the attack is the same. 
 
-[image]
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/Timing_Attack.png)
 
 On an successful attack the attacker will unflow escrowMap[id], receive Ether sent and Ether from contract. On an unsuccessful attack the attacker will still receive the Ether they sent, since the decryption failed. After a successful attack the attacker can send the encrypted file, receive the decryption key, and then use the requestRefund to retrieve Ether sent. 
 
@@ -70,8 +70,7 @@ There is another method that takes advantage of the communication to the off cha
 
 On success the attacker can retrieve the Ether spent using requestRefund and get the decryption key from the failed transaction. This is because the first callback will be for the file that failed decryption; the Ether spent will be returned to the caller and encFileMap[id] will be cleared. On the second call the function decryptCallback will check to ensure encFileMap[id] is not empty, since it was cleared in the first callback this transaction will fail. As mentioned earlier, failed transactions are still recorded in the blockchain and their arguments can be read, revealing the decrypted encryption key. 
 
-[picture of attack]
-
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/Timing_Attack_payRansom.png)
 
 
 [check if we can change the encrypted file's victim id and then just register with encryption key and download.] 
