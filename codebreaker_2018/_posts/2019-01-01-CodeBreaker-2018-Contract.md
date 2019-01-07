@@ -16,7 +16,7 @@ Additionally, [here](https://blog.ethereum.org/2016/01/15/privacy-on-the-blockch
 
 Below are the flows for a few operations the victim might make. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/contract/contract_deployment.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/contract/contract_deployment.png)
 
 1. Attacker infects victim through an unknown vector
 2. Ransomware sends encrypted encryption key and other information to attacker's server
@@ -28,7 +28,7 @@ Below are the flows for a few operations the victim might make.
 8. Registry calls authCallback in Ransom contract
 9. Ransom contract registers with Escrow, setting victim's address, ransom amount and victim ID
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/contract/victim_pays_ransom_1.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/contract/victim_pays_ransom_1.png)
 
 1. Victim calls payRansom, sending encrypted file and Ether to pay the ransom
 2. Escrow saves encrypted file, and calls requestKey from Ransom contract

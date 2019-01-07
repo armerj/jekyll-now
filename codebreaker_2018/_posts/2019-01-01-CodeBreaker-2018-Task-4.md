@@ -48,9 +48,13 @@ for i in range(0, 0xd):
     contracts.append(w3.eth.getStorageAt('0x5449F8636F1886675cc6b3F491dD27b5A861fba7', hex(int(hash.hex(), 16) + i)))
 {% endhighlight %}
 
+[contracts]
+
 After we have the list of contracts, they can be checked to determine which victims have paid the ransom. 
 
 This can be done by ransomContract->ransomMap->(decKeyMap or vicToPayerMap)
+
+[checking map]
 
 or we can check Events using
 {% highlight python %}
@@ -58,7 +62,7 @@ ev_filter = escrow.eventFilter('DecryptEvent', {'fromBlock' : 0, 'toBlock' : 'la
 events = ev_filter.get_all_entries()
 {% endhighlight %}
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_4/events.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_4/events.png)
 
 Victims that have not paid:<br>
 - 0x5ae034e049c13cfdaf9bc2497221812f90af61e6fcee5d0c3c583dd364275f0b<br>

@@ -10,7 +10,7 @@ The Escrow contract has many problems that causes it to be vulnerable to exploit
 
 To prevent leaking the key when the decryptCallback function fails, a second callback can be created. The decryptCallback should be changed to only move the ransom amount to the attackers control and on success emit an event to release the encryption key. When the oracle sees the event to release the encryption key the oracle will callback to the Escrow contract with the decrypted encryption key. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/contract_improvements/Release_Key.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/contract_improvements/Release_Key.png)
 
 # To Prevent Re-registering #
 

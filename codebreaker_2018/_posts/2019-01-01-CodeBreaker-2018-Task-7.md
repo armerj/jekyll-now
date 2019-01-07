@@ -6,15 +6,15 @@ title: NSA Codebreaker 2018, Task 7
 
 For task 7 a way to retrieve the Ether victims have already paid and send it back to them is required. The vulnerability that makes this possible is in the Escrow contract; it will pass control to the Ransom contract allowing what is call [re-entrancy](https://solidity.readthedocs.io/en/latest/security-considerations.html#re-entrancy). Re-Entrancy is when a contract is able to call back into another contract to effect the state, before the transaction has been completed. The contract is written to protect itself from someone using re-entrancy to send themselves all the Ether directly, since it subtracts the amount before transferring the Ether. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/request_refund.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/request_refund.png)
 
 Re-entrancy can be used to call other functions and effect the state of the contract in other ways. To see how the contract is vulnerable, the payRansom flow needs to be understood. I will go into brief description, but more detail can be found [here](https://armerj.github.io/CodeBreaker-2018-Contract/). 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/contract/victim_pays_ransom_1.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/contract/victim_pays_ransom_1.png)
 
 To decrypt the encryption key an off chain oracle is required, since secrets can't be kept on the block chain. When the decryptKey function is called, the Escrow contract will emit a DecryptEvent for the oracle to process. The oracle will attempt to decrypt the key and use it to decrypt the file submitted by the victim. Once complete the oracle will call the decryptCallback function, which does not check to see if the amount the victim paid is equal or greater then the ransom amount. The function instead assumes that the amount the victim paid is equal or greater, since the values were checked in the decryptKey function. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/decrypt_callback.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/decrypt_callback.png)
 
 # Exploit Contract by Re-registering #
 
@@ -22,11 +22,11 @@ As mentioned in task 6, the Escrow doesn't check if a Ransom contract has alread
 
 We can use this vulnerability and re-entrancy to steal all the Escrow contract's Ether. Below is the flow of the attack. 
  
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/steal_ether.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/steal_ether.png)
 
 Below is a simple time line of the transaction, which makes it more clear that the event is emitted after the block is mined. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/steal_ether_timeline.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/steal_ether_timeline.png)
 
 ## Causing Decryption to Fail to Receive Ether ##
 
@@ -42,7 +42,7 @@ Below is a video of the attack.
 
 Generating multiple decryptEvents will not have the desired effect, since the decryptCallback function will check if there is a encrypted file saved in encFileMap[id] first. If there is a file there it is removed, otherwise the transaction will fail. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/file_check.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/file_check.png)
 
 ## Using Underflow to Call requestRefund ##
 
@@ -52,11 +52,11 @@ The second method is to notice that escrowMap[id] is set to the amount paid, 0 i
 
 If the Escrow contract prevented a Ransom Contract from re-registering, by checking for that victim ID, there is another attack using requestRefund. This requires a little more set up, since calling this function is restricted to the victim address. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/restrict_to_victim.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/restrict_to_victim.png)
 
 The victim address can be set to the Ransom contracts address when the Ransom contract first registers with the Escrow. 
  
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_7/set_vic_address.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_7/set_vic_address.png)
 
 Now, instead of calling the register function, requestRefund is called. This will cause a underflow and requestRefund can be used to retrieve all the Ether. 
 

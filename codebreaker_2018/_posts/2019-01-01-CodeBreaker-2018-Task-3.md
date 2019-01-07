@@ -22,11 +22,11 @@ What is interesting, although irrelevant, about this information is that the ope
 
 To determine how the victim ID is generated, the function _cid needs to be reversed. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_3/gia_otp.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_3/gia_otp.png)
 
 The function _gia is called with a pointer to var_B8, which is then moved to var_98. The epoch time and the base32 decoded OTP secret are passed to a function to create the time-based OTP (TOTP). The malware uses snprintf to convert the TOTP to a string, and later stores the result in *(var_98+4), resulting in \<gia\>\<totp\>. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_3/hmac_args.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_3/hmac_args.png)
 
 The value \<gia\>\<totp\> is used as the input for HMAC-SHA256 with the TOTP secret key as the key to the HMAC algorithm. 
 
@@ -50,7 +50,7 @@ for c in vid:
     print hex(ord(c))[2:],
 {% endhighlight %}
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_3/output.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_3/output.png)
 
 The below python code will generate the victim id required for this task. 
 
