@@ -8,7 +8,7 @@ Each year NSA puts out a challenge called Codebreaker that requires reverse engi
 
 This year I was able to complete all seven tasks, along with 1.3% of participants who finished task 0. 
 - 2866 people signed up<br>
-- 1536 finished task 0 (as of 31 Dec 2018).<br>
+- 1536 finished task 0.<br>
 
 # Task 0 - Warm Up - (Network Traffic Analysis) #
 
