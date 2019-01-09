@@ -18,7 +18,7 @@ This task is a warm up, and requires finding the attacker's IP in a short networ
 
 # Task 1 - It Begins - (Network Traffic Analysis; Binary Reverse Engineering) #
 
-In this task you are given two Linux libaries and the ransom note, in order to find four pieces of information in the PCAP. 
+In this task you are given two Linux libraries and the ransom note, in order to find four pieces of information in the PCAP. 
 
 [Task 1 Writeup](https://armerj.github.io/CodeBreaker-2018-Task-1/)
 
