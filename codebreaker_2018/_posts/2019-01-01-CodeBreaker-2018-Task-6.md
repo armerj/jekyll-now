@@ -41,27 +41,27 @@ There is another option to get the decryption key without paying. This method st
 
 Note for the below example, I set the ransom amount to 0 for testing since I didn't have the 100 ether to do it with the ransom amount set to 100 ether. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/fulfilled_revert.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/fulfilled_revert.png)
 
 I added "require(fulfilled == true);", which will always be false and cause a revert. I deployed the contract and called the payRansom function; the transaction was recorded in block 1894033. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/payRansom_block.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/payRansom_block.png)
 
 This is block 1894033 and contains the transaction hashes for included transactions, only 1 for this block. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/payRansom_trans.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/payRansom_trans.png)
 
 This is the first transaction for block 1894033, which corresponds to the payRansom function. The function arguments are found under input. We can check the next few block to look for the  transaction for the oracle calling decryptCallback. If there were more blocks and transactions, then we could use python to iterate through each transaction in a block and filter on the from and to addresses. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/decryptCallback_trans.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/decryptCallback_trans.png)
 
 The decrypted key is recorded in the transaction's input. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/trans_status.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/trans_status.png)
 
 The transaction receipt can be used to determine if a function succeeded (1) or failed (0). The transaction for the oracle calling decryptCallback failed. 
 
-![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/transaction_events.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/transaction_events.png)
 
 Additionally, as suspected there is no event emitted from the decryptCallback function, since the transaction failed. 
 
@@ -98,4 +98,5 @@ There is another method that takes advantage of the communication to the off cha
 On success the attacker can retrieve the Ether spent using requestRefund and get the decryption key from the failed transaction. This is because the first callback will be for the file that failed decryption; the Ether spent will be returned to the caller and encFileMap[id] will be cleared. On the second call the function decryptCallback will check to ensure encFileMap[id] is not empty, since it was cleared in the first callback this transaction will fail. As mentioned earlier, failed transactions are still recorded in the blockchain and their arguments can be read, revealing the decrypted encryption key. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/Timing_Attack_payRansom.png)
+
 
