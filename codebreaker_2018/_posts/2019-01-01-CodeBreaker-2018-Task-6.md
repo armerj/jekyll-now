@@ -12,7 +12,6 @@ Below are some of the reasons this is possible:<br>
 - Escrow contract does not check to see if a victim ID has already been registered<br>
 - Ransom amount is set by the Ransom contract<br>
 - Ransom amount is not validated by Escrow<br>
-[picture]
 
 # Exploit Contract by Registering with ransomAmount = 0 #
 
@@ -37,41 +36,42 @@ totp.now()
 
 # Exploit Contract by Causing Revert #
 
-There is another option to get the decryption key without paying. This method still requires you to deploy a modified contract, and send the complete ransom amount. When the decryptCallback function is called the Escrow contract will pass control to the Ransom contract by calling the fulfillContract function. If this function causes a revert, then the ransom will never leave the escrow and go into the attacker's control. The transaction that caused the failure will still be [included in the blockchain](https://ethereum.stackexchange.com/questions/39817/are-failed-transactions-included-in-the-blockchain), so that the caller still has to pay for the gas to process. The failed block should be [retrievable just like any other block](https://ethereum.stackexchange.com/questions/56908/where-can-i-find-failed-transactions); here is an example of a [failed block](https://etherscan.io/tx/0xd1c64ba497a831db014fcd1a41a12f4a08b9f5ee18ed6171f8fef06cc3e5f817) provided. 
+There is another option to get the decryption key without paying. This method still requires you to deploy a modified contract, and send the complete ransom amount. When the decryptCallback function is called the Escrow contract will pass control to the Ransom contract by calling the fulfillContract function. If this function causes a revert, then the ransom will never leave the escrow and go into the attacker's control. The transaction that caused the failure will still be [included in the blockchain](https://ethereum.stackexchange.com/questions/39817/are-failed-transactions-included-in-the-blockchain), so that the caller still has to pay for the gas to process. The failed block can be [retrievable just like any other block](https://ethereum.stackexchange.com/questions/56908/where-can-i-find-failed-transactions); here is an example of a [failed block](https://etherscan.io/tx/0xd1c64ba497a831db014fcd1a41a12f4a08b9f5ee18ed6171f8fef06cc3e5f817) provided. 
 
 Note for the below example, I set the ransom amount to 0 for testing since I didn't have the 100 ether to do it with the ransom amount set to 100 ether. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/fulfilled_revert.png)
-
 I added "require(fulfilled == true);", which will always be false and cause a revert. I deployed the contract and called the payRansom function; the transaction was recorded in block 1894033. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/payRansom_block.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/fulfilled_revert.png)
 
 This is block 1894033 and contains the transaction hashes for included transactions, only 1 for this block. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/payRansom_trans.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/payRansom_block.png)
 
 This is the first transaction for block 1894033, which corresponds to the payRansom function. The function arguments are found under input. We can check the next few block to look for the  transaction for the oracle calling decryptCallback. If there were more blocks and transactions, then we could use python to iterate through each transaction in a block and filter on the from and to addresses. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/decryptCallback_trans.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/payRansom_trans.png)
 
 The decrypted key is recorded in the transaction's input. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/trans_status.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/decryptCallback_trans.png)
 
 The transaction receipt can be used to determine if a function succeeded (1) or failed (0). The transaction for the oracle calling decryptCallback failed. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/transaction_events.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/trans_status.png)
 
 Additionally, as suspected there is no event emitted from the decryptCallback function, since the transaction failed. 
+
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/transaction_events.png)
 
 The decrypted encryption key will forever be included in the blockchain, and Ether paid can be retrieved using requestRefund. 
 
 # Exploit Contract Through Race Condition #
+If the authToken can't be determined in order to deploy a modified contract, the decrypted encryption key can still be retrieved by the below methods to exploit a race condition.
 
 ## Exploit by Calling requestRefund ##
 
-If the authToken can't be determined in order to deploy a modified contract, there is still a method to retrieve the decryption key. This method requires that the full ransom amount be paid, but afterwards any Ether paid can be retrieved. This exploit is possible since the decryptCallback function does not check if the escrowMap[id] is greater than the ransomAmount (you may see a trend here, many of the attacks I mention in task 7 are because of this). This attack is known as [Front Running (AKA Transaction-Ordering Dependence)](https://consensys.github.io/smart-contract-best-practices/known_attacks/#front-running-aka-transaction-ordering-dependence), which is when the transactions with a contract have to happen in a certain order. 
+This method requires that the full ransom amount be paid, but afterwards any Ether paid can be retrieved. This exploit is possible since the decryptCallback function does not check if the escrowMap[id] is greater than the ransomAmount (you may see a trend here, many of the attacks I mention in task 7 are because of this). This attack is known as [Front Running (AKA Transaction-Ordering Dependence)](https://consensys.github.io/smart-contract-best-practices/known_attacks/#front-running-aka-transaction-ordering-dependence), which is when the transactions with a contract have to happen in a certain order. 
 
 In the Escrow contract, paying the ransom and the ransom being moved to the attacker's control happen in two different transactions. This opens the possibility for someone to exploit a race condition, and submit a third transaction for calling the function requestRefund in between the previous transactions. [Solidity: Transaction-Ordering Attacks](https://medium.com/coinmonks/solidity-transaction-ordering-attacks-1193a014884e) has a detailed example of this attack. In short the malicious party, us, would submit the transaction for requestRefund with a higher gas price than the transaction with decryptCallback, ensuring that miners will prioritize our transaction over others when including transactions in blocks to mine. 
 
