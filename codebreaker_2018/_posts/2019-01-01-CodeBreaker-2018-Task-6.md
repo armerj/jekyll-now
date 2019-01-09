@@ -38,13 +38,39 @@ totp.now()
 
 # Exploit Contract by Causing Revert #
 
-There is another option, though I have not tested it, to get the decryption key without paying. This method still requires you to deploy a modified contract, and send the complete ransom amount. When the decryptCallback function is called the Escrow contract will pass control to the Ransom contract by calling the fulfillContract function. If this function causes a revert, then the ransom will never leave the escrow and go into the attacker's control. The transaction that caused the failure will still be [included in the blockchain](https://ethereum.stackexchange.com/questions/39817/are-failed-transactions-included-in-the-blockchain), so that the caller still has to pay for the gas to process. The failed block should be [retrievable just like any other block](https://ethereum.stackexchange.com/questions/56908/where-can-i-find-failed-transactions); here is an example of a [failed block](https://etherscan.io/tx/0xd1c64ba497a831db014fcd1a41a12f4a08b9f5ee18ed6171f8fef06cc3e5f817) provided. 
+There is another option to get the decryption key without paying. This method still requires you to deploy a modified contract, and send the complete ransom amount. When the decryptCallback function is called the Escrow contract will pass control to the Ransom contract by calling the fulfillContract function. If this function causes a revert, then the ransom will never leave the escrow and go into the attacker's control. The transaction that caused the failure will still be [included in the blockchain](https://ethereum.stackexchange.com/questions/39817/are-failed-transactions-included-in-the-blockchain), so that the caller still has to pay for the gas to process. The failed block should be [retrievable just like any other block](https://ethereum.stackexchange.com/questions/56908/where-can-i-find-failed-transactions); here is an example of a [failed block](https://etherscan.io/tx/0xd1c64ba497a831db014fcd1a41a12f4a08b9f5ee18ed6171f8fef06cc3e5f817) provided. 
+
+Note for the below example, I set the ransom amount to 0 for testing since I didn't have the 100 ether to do it with the ransom amount set to 100 ether. 
+
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/fulfilled_revert.png)
+
+I added "require(fulfilled == true);", which will always be false and cause a revert. I deployed the contract and called the payRansom function; the transaction was recorded in block 1894033. 
+
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/payRansom_block.png)
+
+This is block 1894033 and contains the transaction hashes for included transactions, only 1 for this block. 
+
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/payRansom_trans.png)
+
+This is the first transaction for block 1894033, which corresponds to the payRansom function. The function arguments are found under input. We can check the next few block to look for the  transaction for the oracle calling decryptCallback. If there were more blocks and transactions, then we could use python to iterate through each transaction in a block and filter on the from and to addresses. 
+
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/decryptCallback_trans.png)
+
+The decrypted key is recorded in the transaction's input. 
+
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/trans_status.png)
+
+The transaction receipt can be used to determine if a function succeeded (1) or failed (0). The transaction for the oracle calling decryptCallback failed. 
+
+![_config.yml]({{ site.baseurl }}/images/Codebreaker_2018/Task_6/transaction_events.png)
+
+Additionally, as suspected there is no event emitted from the decryptCallback function, since the transaction failed. 
 
 The decrypted encryption key will forever be included in the blockchain, and Ether paid can be retrieved using requestRefund. 
 
 # Exploit Contract Through Race Condition #
 
-## Exloit by Calling requestRefund ##
+## Exploit by Calling requestRefund ##
 
 If the authToken can't be determined in order to deploy a modified contract, there is still a method to retrieve the decryption key. This method requires that the full ransom amount be paid, but afterwards any Ether paid can be retrieved. This exploit is possible since the decryptCallback function does not check if the escrowMap[id] is greater than the ransomAmount (you may see a trend here, many of the attacks I mention in task 7 are because of this). This attack is known as [Front Running (AKA Transaction-Ordering Dependence)](https://consensys.github.io/smart-contract-best-practices/known_attacks/#front-running-aka-transaction-ordering-dependence), which is when the transactions with a contract have to happen in a certain order. 
 
@@ -68,7 +94,7 @@ The above attack can also be used for task 7.
 
 ## Exploit by Calling payRansom Twice ##
 
-There is another method that takes advantage of the communication to the off chain oracle and ordering of transactions. This method is to call the payRansom function twice, one with a file to cause the decryption to fail, and the second with one to cause it to succeed. This requires the attacker to have enough Ether to pay the ransom twice, and runs the risk of losing half the Ether spent. 
+There is another method that takes advantage of the communication to the off chain oracle and ordering of transactions. I have not tested this attack, but it works the same as the above attack for causing a revert, except the failure is caused in decryptCallback instead of fulfillContract. This method is to call the payRansom function twice, one with a file to cause the decryption to fail, and the second with one to cause it to succeed. This requires the attacker to have enough Ether to pay the ransom twice, and runs the risk of losing half the Ether spent. 
 
 On success the attacker can retrieve the Ether spent using requestRefund and get the decryption key from the failed transaction. This is because the first callback will be for the file that failed decryption; the Ether spent will be returned to the caller and encFileMap[id] will be cleared. On the second call the function decryptCallback will check to ensure encFileMap[id] is not empty, since it was cleared in the first callback this transaction will fail. As mentioned earlier, failed transactions are still recorded in the blockchain and their arguments can be read, revealing the decrypted encryption key. 
 
