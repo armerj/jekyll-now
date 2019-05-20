@@ -39,6 +39,7 @@ The encrypted key is 0x200 chars.
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_1/cid_call.png)
 
 The _cid function takes 3 arguments, each are pointers to data return, they are set to the IP address, victim id, and the time-based one time password (TOTP). 
+(Correction: The 1st argument to _cid is a pointer to a buffer that should already be set to the IP address. If it is NULL then _cid will call the _gia function to determine the IP address.)
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_1/otp_code.png)
 
