@@ -12,6 +12,8 @@ Below are some of the reasons this is possible:<br>
 - Escrow contract does not check to see if a victim ID has already been registered<br>
 - Ransom amount is set by the Ransom contract<br>
 - Ransom amount is not validated by Escrow<br>
+[picture]
+- ?Encryption key is not tied to victim ID?<br>
 
 # Exploit Contract by Registering with ransomAmount = 0 #
 
@@ -99,4 +101,6 @@ On success the attacker can retrieve the Ether spent using requestRefund and get
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2018/Task_6/Timing_Attack_payRansom.png)
 
+
+[check if we can change the encrypted file's victim id and then just register with encryption key and download.] 
 
