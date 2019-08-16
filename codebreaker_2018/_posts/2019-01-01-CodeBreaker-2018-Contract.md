@@ -12,6 +12,8 @@ There are a few other differences compared to traditional programming. Transacti
 
 Here are some good resources on Ethereum [security](https://solidity.readthedocs.io/en/latest/security-considerations.html#re-entrancy) and [attacks](https://consensys.github.io/smart-contract-best-practices/known_attacks/).
 
+David Wong and Mason Hemmel gave a [talk](https://youtu.be/95-pdnUQQSo) at Black Hat Asia 2018 about common vulerniablies found in Ethereum contracts. 
+
 Additionally, [here](https://blog.ethereum.org/2016/01/15/privacy-on-the-blockchain/) is a good read on privacy on the blockchain. 
 
 Below are the flows for a few operations the victim might make. 
