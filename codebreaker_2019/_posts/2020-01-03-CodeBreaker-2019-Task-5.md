@@ -83,17 +83,17 @@ Authentication is not same as authorization. [Anum Siddiqui](https://medium.com/
 
 I can now masquerade as different users. I logged in as each user to determine the each user's contacts and map their relationships. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/user_connections.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/user_connections.png)
 
 The users are separated into clear groups. Arianna talks to Brian, who only talks with two other users. Zachary and Aliah each have their own groups that are more connected. This implies that Brian is the leader and Arianna, Zachary, and Aliah are cell leaders. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/user_connections_marked.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/user_connections_marked.png)
 
 # Getting Encrypted Messages #
 
 The messages that are not decrypted are silently dropped and not displayed to the user. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/logcat_decrypt.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/logcat_decrypt.png)
 
 There are a few methods I tried to get the messages with varying levels of success. 
 
@@ -118,7 +118,7 @@ There are two methods to redirect traffic to the socat listener<br>
 
 I probably choose the harder method of changing the DNS response by editing the host file. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/edit_host_file.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/edit_host_file.png)
 
 socat commands
 {% highlight bash %}
@@ -130,16 +130,16 @@ socat -v tcp4-listen:6500,reuseaddr,fork ssl:chat.terrortime.app:443,verify=0
 
 Unfortunately, the XMPP protocol uses STARTTLS (described in [RFC6120 5.4.2](https://www.ietf.org/rfc/rfc6120.txt)) to upgrade a normal connection to a secure connection. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/starttls_flow.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/starttls_flow.png)
 
 Socat does not handle STARTTLS, but instead expects the connection to start out as a secure connection. I looked at using ![striptls](https://github.com/tintinweb/striptls) to stop the upgrade to a TLS connection. This is in reference to CVE-2016-10027, which is a vulnerability in the Smack XMPP library. This tool did not work since the XMPP server is configured to require a TLS connection. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/starttls.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/starttls.png)
 
 ## Frida ##
 ![Frida](https://frida.re/docs/android/) can inject Javascript into a running Android app. It enables a user to hook or modify existing functions, along with running new code. Frida requires root access to the Android to run the frida server. If you do not have root access but the app is marked as debuggable, then [frida can be loaded](https://koz.io/library-injection-for-debuggable-android-apps/) using the debugger. Additionally, I used [11x256's blog](https://11x256.github.io/Frida-hooking-android-part-1/) to setup the python script to interact with Frida and the Javascript to inject. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/message_flow.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/message_flow.png)
 
 Python code<br>
 {% highlight python %}
@@ -193,11 +193,11 @@ Java.perform(function x(){ //Silently fails without the sleep from the python co
 });
 {% endhighlight %}
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/message_flow_modified.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/message_flow_modified.png)
 
 By hooking the decryptMessage function, I was able to print out each message the TerrorTime app recieves. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_5/hook_message.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/hook_message.png)
 
 
 

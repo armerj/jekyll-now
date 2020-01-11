@@ -44,7 +44,7 @@ I used android studio to emulate a Nexus S android phone running Oreo. I used th
 - Give the device a name, and
 - Click Finish. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_4/avd.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/avd.png)
 
 The AVD manager or command line tool emulator.exe can start the emulator. Installing or copying a file is as simple as dragging the file onto the phone screen. I used adb.exe to interact with the phone file system. When I dragged the database file to the phone, it was downloaded to /sdcard/Downloads. 
 
@@ -66,7 +66,7 @@ cp /sdcard/Downloads/clientDB.db database/clientDB.db
 {% endhighlight %}
 
 [Connection error]
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_4/X.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/conn_error.png)
 
 When the codebreaker creators started designed the challenge they set the app to wait for 5 secs before timing out. This was not enough time due to the amount of participants. They released an updated version that waited 30 secs. 
 
@@ -83,7 +83,7 @@ Arianna|Kingsley|Is everything set?|She's checking on the status of the op
 Arianna|Kingsley|Be grateful for your role in this, Kingsley|She's telling him to be grateful
 Kingsley|Arianna|yes ma'am|He is very formal with her
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_4/chat_1.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/chat_1.png)
 
 From|To|Message|Reason
 ----|---|------|------
@@ -91,7 +91,7 @@ Kingsley|Devora|want to make sure the ma'am is pleased and confident in us.|Want
 Kingsley|Devora|see you after New Years Day|Is meeting Devora for the op
 ** need time message ** 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_4/chat_2.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/chat_2.png)
 
 I used the following messages to determine the date. 
 From|To|Message|Reason
@@ -104,7 +104,7 @@ I now knew the date of the upcoming operation, 01/02/2020. I used an online epoc
 
 determining action. I was only able to determine that wedding usually refers to a big attack (source). 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_3/dig_command.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_3/dig_command.png)
 
 
 

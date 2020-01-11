@@ -22,18 +22,18 @@ I was provided a SQLite database that was recovered from a device with TerrorTim
 - Col 11 \- Encrypted RSA Private Key<br>
 - Col 12 \- Encrypted pin for accessing TerrorTime application<br>
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_3/database_code.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_3/database_code.png)
 
 I found this information the ClientDBHandlerClass.addOrUpdateClient function. One thing to note for later is that the username appears twice; in column one and column 3. 
 
 * image of database *
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_3/database.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_3/database.png)
 
 The command line dig can resolve the domain name to an IP address. 
 - chat[.]terrortime[.]app resolves to 54[.]91[.]5[.]130
 - register[.]terrortime[.]app points to codebreaker[.]ltsnet[.]net which resolves to 54[.]197[.]185[.]236
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_3/dig_command.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_3/dig_command.png)
 
 
 

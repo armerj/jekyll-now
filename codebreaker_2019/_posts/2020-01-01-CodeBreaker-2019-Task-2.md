@@ -13,18 +13,17 @@ Task 2 requires you to examine the android app TerrorTime extract basic metadata
 
 I used the tool jadx to read TerrorTime's AndroidManifest.xml file to extract the permissions. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_2/permissions.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_2/permissions.png)
 
 It took me some time to extract the signing certificate. A Google search will provide instructions to extract the certificate using tools such as unzip, jarsigner or apktool. These methods are for [APK Signature Scheme v1](https://source.android.com/security/apksigning#v1) which is based on signed JAR. TerrorTime was signed using [APK Signature Scheme v2](https://source.android.com/security/apksigning/v2) which inserts the certificate into the ZIP file before the central directory. This enables verification of the ZIP contents and metadata. 
 
-* image of signing block * 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_1/X)
+** image of signing block **
 
 If the APK is decompressed using a tool like unzip, the certificate data is ignored and it appears as if the app was not signed. Below is the output of jarsigner. 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_2/unsigned_jar.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_2/unsigned_jar.png)
 
 ** extracting the cert **
 
 The tool jadx can extract and parse the APK Signature Scheme v2 certificate. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_1/signature.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_2/signature.png)
