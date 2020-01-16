@@ -6,46 +6,10 @@ title: NSA Codebreaker 2019, Task 5
 
 Task 5 requires you to determine the organization's leader and submit his last encrypted message. 
 
-
-*https://gist.github.com/nstarke/615ca3603fdded8aee47fab6f4917826*
-*https://developer.android.com/studio/debug*
-https://securitygrind.com/how-to-exploit-a-debuggable-android-application/
-
-
 # Analyzing the OAUTH Verification Python Script #
 The task provides a compiled python script that the server uses to verify a user's OAUTH tokens when logging into the XMPP server. I ran *file* on the pyc file which reported that it was a "python 2.7 byte-compiled" file. I used *uncompyle6* to decompile the file to a python script. 
 
-{% highlight python %}
-...
-def check_token(token, url):
-    try:
-        data = 'token=' + token
-        req = urllib2.Request(url, data=data)
-        resp = urllib2.urlopen(req)
-    except:
-        logger.exception('Token introspect request failed')
-        return False
-    else:
-        if resp.getcode() != 200:
-            logger.error('Bad HTTP response code: %d', resp.getcode())
-            return False
-        try:
-            j = json.loads(resp.read())
-        except:
-            logger.exception('Malformed response data')
-            return False
-
-        logger.debug('Token Verification Response: %s', pprint.pformat(j))
-        try:
-            if j[u'active'] and u'chat' in j[u'scope'] and j[u'token_type'] == u'access_token':
-                return True
-        except:
-            logger.exception('Exception in token response logic')
-            return False
-
-    return False
-...
-{% endhighlight %}
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/auth_py.png)
 
 The file contains two functions, main and check_token. The important function is check_token, which<br>
 - makes a request to a oauth2 server to introspect the token and<br>
@@ -54,7 +18,7 @@ The file contains two functions, main and check_token. The important function is
 	- scope contains "chat", and
 	- the token type is "access_token".
 
-The token is comprised of the clientID and a value derived from the client's secert. 
+The token is comprised of the clientID and a value derived from the client's secret. 
 
 {% highlight python %}
 from base64 import b64decode
@@ -63,7 +27,7 @@ b64decode("a2luZ3NsZXktLXZob3N0LTE3NEB0ZXJyb3J0aW1lLmFwcDp6ZENVQ2RubUVLdDB0Ug=="
 # outputs 'kingsley--vhost-174@terrortime.app:zdCUCdnmEKt0tR'
 {% endhighlight %}
 
-I didn't see any method to get a token for a different user. Then, I realized that the token is never checked against the user logging in. Remeber from task 3 that the database contains an entry for clientID and XMPP name. The token is only based on the clientID and the XMPP name is used to log into the XMPP server. This means that I could leave the clientID unchanged but change the XMPP name to the user I wanted to masquerade as. 
+I didn't see any method to get a token for a different user. Then, I realized that the token is never checked against the user logging in. Remember from task 3 that the database contains an entry for clientID and XMPP name. The token is only based on the clientID and the XMPP name is used to log into the XMPP server. This means that I could leave the clientID unchanged but change the XMPP name to the user I wanted to masquerade as. 
 
 The app would<br>
 - Request a OAUTH token for Kingsley<br>
@@ -98,10 +62,34 @@ The messages that are not decrypted are silently dropped and not displayed to th
 There are a few methods I tried to get the messages with varying levels of success. 
 
 ## Burp Suite ##
-I have used Burp Suite in the past to inspect HTTP(S) traffic and decided try it since the traffic was over port 443. To use Burp Suite a root certificate needs to be added to the android phone. This enables the android phone to trust certificates signed by Burp Suite. The following steps will install the root certificate<br>
-- *X* *Though you may not have had to do that. Need to test if it did cert verification*
+I have used Burp Suite in the past to inspect HTTP(S) traffic and decided try it since the traffic was over port 443. Normally, to use Burp Suite a root certificate needs to be added to the android phone. This enables the android phone to trust certificates signed by Burp Suite. The following steps, from [Distributed Compute](https://distributedcompute.com/2019/08/15/tech-note-installing-burp-certificate-on-android-9/), will install the root certificate.<br>
+- Export Burp CA certificate from Proxy -> Options page in DER format<br>
+- Convert DER to PEM format and rename as subject hash<br>
+{% highlight bash %}
+openssl x509 -inform DER -in burp.der -out burp.pem
+openssl x509 -inform PEM -subject_hash_old -in burp.pem | head -1
+mv burp.pem <previous command output>
+{% endhighlight %}
+- Copy certificate to Android 
+- Restart the emulator with system writeable option and remount /system as read/write
+{% highlight bash %}
+emulator.exe -avd <avd_name> -writable-system
+adb shell su -c “mount -o rw,remount,rw /”
+adb shell
+{% endhighlight %}
+- Move file to trusted certificate store
+{% highlight bash %}
+cp /sdcard/Downloads/<subject_hash>.0 /system/etc/security/cacerts
+chmod 644 /system/etc/security/cacerts/<subject_hash>.0
+reboot
+{% endhighlight %}
 
-*set up proxy on android*
+This step was not required since TerrorTime does not check that the certificate is chained to a trusted CA. 
+
+The Android's proxy configuration is under Extended Controls -> Settings -> Proxy. 
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/proxy.png)
+
+This setup does not work since Burp only handles HTTP traffic. I tried using Burp since the XMPP traffic uses port 443 which is for secure web traffic. Unfortunately, Burp ignores it since its not HTTP or HTTPS traffic. I did not try it, but there is an extension called [NoPE Proxy](https://github.com/summitt/Burp-Non-HTTP-Extension) that handles non-HTTP traffic. 
 
 ## Socat ##
 Socat is a tool that can redirect and manipulate network traffic. I followed a guide by [PenTestPartners](https://www.pentestpartners.com/security-blog/socat-fu-lesson/) to setup socat to <br>
@@ -137,82 +125,29 @@ Socat does not handle STARTTLS, but instead expects the connection to start out 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/starttls.png)
 
 ## Frida ##
-![Frida](https://frida.re/docs/android/) can inject Javascript into a running Android app. It enables a user to hook or modify existing functions, along with running new code. Frida requires root access to the Android to run the frida server. If you do not have root access but the app is marked as debuggable, then [frida can be loaded](https://koz.io/library-injection-for-debuggable-android-apps/) using the debugger. Additionally, I used [11x256's blog](https://11x256.github.io/Frida-hooking-android-part-1/) to setup the python script to interact with Frida and the Javascript to inject. 
+![Frida](https://frida.re/docs/android/) can inject JavaScript into a running Android app. It enables a user to hook or modify existing functions, along with running new code. Frida requires root access to the Android to run the Frida server. If you do not have root access but the app is marked as debuggable, then [frida can be loaded](https://koz.io/library-injection-for-debuggable-android-apps/) using the debugger. Additionally, I used [11x256's blog](https://11x256.github.io/Frida-hooking-android-part-1/) to setup the python script to interact with Frida and the JavaScript to inject. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/message_flow.png)
 
-Python code<br>
-{% highlight python %}
-#from https://11x256.github.io/Frida-hooking-android-part-1/
-import frida
-import time
-device = frida.get_usb_device()
-pid = device.spawn(["com.example.a11x256.frida_test"])
-device.resume(pid)
-time.sleep(1) #Without it Java.perform silently fails
-session = device.attach(pid)
-script = session.create_script(open("hook_message.js").read())
-script.load()
+Python code to start TerrorTime and inject the JavaScript.
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/python.png)
 
-#prevent the python script from terminating
-raw_input()
-{% endhighlight %}
+Below is the JavaScript injected into the TerrorTime app; it hooks the decryptMessage to print to the console all messages received. Additionally, it hooks functions called when sending and receiving Stanzas to print them to the console. <br>
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/js.png)
 
-Below is the Javascript injected into the TerrorTime app; it hooks the decryptMessage and sendStanzaInternal functions.<br>
-{% highlight javascript %}
-function bin2string(array){ // https://gist.github.com/taterbase/2784890
-	var result = "";
-	for(var i = 0; i < array.length; ++i){
-		result+= (String.fromCharCode(array[i]));
-	}
-	return result;
-}
-
-console.log("Script loaded successfully ");
-Java.perform(function x(){ //Silently fails without the sleep from the python code
-    console.log("Inside java perform function");
-    //get a wrapper for our class
-    var my_class = Java.use("com.badguy.terrortime.Client");
-    
-    my_class.decryptMessage.overload("com.badguy.terrortime.Message").implementation = function(y){
-        console.log("Message:\n\tDate: " + " " + y.getCreationDate() + "\n\tFrom: " + y.getContactId() + "\n\tFrom client: " + y.isFromClient() +  "\n\tContent: " + bin2string(y.getContent()));
-        
-        var x = this.decryptMessage(y); // may need to cast this
-        //console.log("Message:\n\tDate: " + x.getCreatedAt() + "\n\tFrom: " + x.getContactId() + "\n\tFrom client: " + x.isFromClient() +  "\n\tContent: " + bin2string(x.getContent()));
-        return x
-    };
-
-    var my_class_2 = Java.use("org.jivesoftware.smack.tcp.XMPPTCPConnection");
-    
-    my_class_2.sendStanzaInternal.implementation = function(x){
-        console.log("Sent Stanza:" + x.toString()); // Base class for XMPP Stanzas, which are called Stanza(/Packet) in older versions of Smack (i.e. < 4.1).
-        // http://javadox.com/org.igniterealtime.smack/smack-core/4.1.1/org/jivesoftware/smack/packet/Stanza.html
-        this.sendStanzaInternal(x);
-    };
-    console.log("Created hooks");
-});
-{% endhighlight %}
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/message_flow_modified.png)
 
-By hooking the decryptMessage function, I was able to print out each message the TerrorTime app recieves. 
+By hooking the decryptMessage function, I was able to print out each message the TerrorTime app receives. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/hook_message.png)
-
-
-
-get TLS master secert
-
-stunnel
-https://security.stackexchange.com/questions/33374/whats-an-easy-way-to-perform-a-man-in-the-middle-attack-on-ssl
-https://www.stunnel.org/
-https://gist.github.com/ohpe/e02596a2c2247ea1a212e019c355e2c3
-
 
 Things that should work, but I didn't try <br>
 - xmpp man-in-the-middle,<br>
 - [NoPE Proxy](https://github.com/summitt/Burp-Non-HTTP-Extension) (Burp-Non-HTTP-Extension),<br>
-- building/modifying android app, and<br>
-- using xmpp python library. 
+- building/modifying android app,<br>
+- using xmpp python library,<br>
+- stunnel, can handle STARTTLS, and<br>
+- retrieving the TLS master secret from the Android app.<br>
 
 I was now able to login as Brian and extract his last encrypted message to fulfill the task. 
