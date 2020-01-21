@@ -66,9 +66,9 @@ Example
 </pre>
 
 
-The each user's public key fingerprints in the internal structure are checked to determine if the the message key was encrypted with a corresponding public key. If the internal structure contains a fingerprint that was not used, then TerrorTime treats the message as corrupt and drops it. Interestingly, the app does not check if the public key belongs to the sender or the receiver. Additionally, the message key can be encrypted with a public key that is not recorded in the internal structure. This is why I could send messages without error. 
+Each user's public key fingerprints in the internal structure are checked to determine if the the message key was encrypted with a corresponding public key. If the internal structure contains a fingerprint that was not used, then TerrorTime treats the message as corrupt and drops it. Interestingly, the app does not check if the public key belongs to the sender or the receiver. Additionally, the message key can be encrypted with a public key that is not recorded in the internal structure. This is why I could send messages without error. 
 
-Below if the JavaScript I injected into TerrorTime to manipulate the message's internal structure to fix the corrupt issue. The script hooks the Messaging.encryptMessage function and changes the arguments sent to the real function. The client's public key fingerprints list is replaced with the contact's. Now when the contact receives the message, the internal structure only contains fingerprints for their own public keys.
+Below is the JavaScript I injected into TerrorTime to manipulate the message's internal structure to fix the corrupt issue. The script hooks the Messaging.encryptMessage function and changes the arguments sent to the real function. The client's public key fingerprints list is replaced with the contact's. Now when the contact receives the message, the internal structure only contains fingerprints for their own public keys.
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/encryptMessage.png)
 
@@ -104,14 +104,15 @@ Below are picture of the initial and final states of testing the method, along w
 - added Zachary to Brian's block list,<br>
 - sent a second message which was blocked,<br>
 - added Zachary to Brian's allow list, and<br>
-- sent a final message that was received. 
+- sent a final message that was received.<br>
+- 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/privacy_block_intial.png)
 
 Full video can be found [here](https://youtu.be/nEI1I4CRf0g). 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/block_list_fast.gif)
 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/privacy_block_final.png.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/privacy_block_final.png)
 
 # Removing the public key from VCard #
 I used the VCardHelper.savePublicKey function as a template to write JavaScript to replace the spoofed user's public key from their VCard with my own. The below JavaScript will monitor TerrorTime for instances of the class com.badguy.terrortime.TerrorTimeApplication. Once found, the javascript<br>
