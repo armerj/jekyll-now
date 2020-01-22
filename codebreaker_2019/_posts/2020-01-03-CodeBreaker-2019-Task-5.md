@@ -4,7 +4,7 @@ permalink: /CodeBreaker-2019-Task-5/
 title: NSA Codebreaker 2019, Task 5
 ---
 
-Task 5 requires you to determine the organization's leader and submit his last encrypted message. 
+Task 5 requires you to determine the organization's leader's identity and submit his last encrypted message. 
 
 # Analyzing the OAUTH Verification Python Script #
 The task provides a compiled python script that the server uses to verify a user's OAUTH tokens when logging into the XMPP server. I ran *file* on the pyc file which reported that it was a "python 2.7 byte-compiled" file. I used *uncompyle6* to decompile the file to a python script. 
@@ -37,15 +37,14 @@ The server would<br>
 - Check if the OAUTH token was vaild and for chat
 - Allow login 
 
-Using Logcat
-Logcat can pull logs from an android app and print them to the console. The flag pid will limit the output to the app running under that pid and "*:V" means to print all tags verbose. 
+Logcat can pull logs from an android app and print them to the console. The flag pid will limit the output to the app running under that pid and "*:V" means to print all tags with verbose output. 
 {% highlight bash %}
 .\adb.exe -e logcat --pid=21576 --format=color *:V
 {% endhighlight %}
 
 Authentication is not same as authorization. [Anum Siddiqui](https://medium.com/datadriveninvestor/authentication-vs-authorization-716fea914d55) said it well on his blog, "... authentication is the process of verifying oneself, while authorization is the process of verifying what you have access to." The server only checks for authentication and not authorization, enabling me to authenticate as Kingsley but login as Arianna. 
 
-I can now masquerade as different users. I logged in as each user to determine the each user's contacts and map their relationships. 
+I can now masquerade as different users. I logged in as each user to determine each user's contacts and map their relationships. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/user_connections.png)
 
@@ -62,7 +61,7 @@ The messages that are not decrypted are silently dropped and not displayed to th
 There are a few methods I tried to get the messages with varying levels of success. 
 
 ## Burp Suite ##
-I have used Burp Suite in the past to inspect HTTP(S) traffic and decided try it since the traffic was over port 443. Normally, to use Burp Suite a root certificate needs to be added to the android phone. This enables the android phone to trust certificates signed by Burp Suite. The following steps, from [Distributed Compute](https://distributedcompute.com/2019/08/15/tech-note-installing-burp-certificate-on-android-9/), will install the root certificate.<br>
+I have used Burp Suite in the past to inspect HTTP(S) traffic and decided to try it since the traffic was over port 443. Normally, to use Burp Suite a root certificate needs to be added to the android phone. This enables the android phone to trust certificates signed by Burp Suite. The following steps, from [Distributed Compute](https://distributedcompute.com/2019/08/15/tech-note-installing-burp-certificate-on-android-9/), will install the root certificate.<br>
 - Export Burp CA certificate from Proxy -> Options page in DER format<br>
 - Convert DER to PEM format and rename as subject hash<br>
 {% highlight bash %}
@@ -89,7 +88,7 @@ This step was not required since TerrorTime does not check that the certificate 
 The Android's proxy configuration is under Extended Controls -> Settings -> Proxy. 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/proxy.png)
 
-This setup does not work since Burp only handles HTTP traffic. I tried using Burp since the XMPP traffic uses port 443 which is for secure web traffic. Unfortunately, Burp ignores it since its not HTTP or HTTPS traffic. I did not try it, but there is an extension called [NoPE Proxy](https://github.com/summitt/Burp-Non-HTTP-Extension) that handles non-HTTP traffic. 
+This setup does not work since Burp only handles HTTP(S) traffic, even though the XMPP traffic is using port 443 which is for secure web traffic. Unfortunately, Burp ignores it since its not HTTP or HTTPS traffic. I did not try it, but there is an extension called [NoPE Proxy](https://github.com/summitt/Burp-Non-HTTP-Extension) that handles non-HTTP traffic. 
 
 ## Socat ##
 Socat is a tool that can redirect and manipulate network traffic. I followed a guide by [PenTestPartners](https://www.pentestpartners.com/security-blog/socat-fu-lesson/) to setup socat to <br>
@@ -120,22 +119,23 @@ Unfortunately, the XMPP protocol uses STARTTLS (described in [RFC6120 5.4.2](htt
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/starttls_flow.png)
 
-Socat does not handle STARTTLS, but instead expects the connection to start out as a secure connection. I looked at using ![striptls](https://github.com/tintinweb/striptls) to stop the upgrade to a TLS connection. This is in reference to CVE-2016-10027, which is a vulnerability in the Smack XMPP library. This tool did not work since the XMPP server is configured to require a TLS connection. 
+Socat does not handle STARTTLS, but instead expects the connection to start out as a secure connection. I looked at using [striptls](https://github.com/tintinweb/striptls) to stop the upgrade to a TLS connection. This is in reference to CVE-2016-10027, which is a vulnerability in the Smack XMPP library. This tool did not work since the XMPP server is configured to require a TLS connection. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/starttls.png)
 
 ## Frida ##
-![Frida](https://frida.re/docs/android/) can inject JavaScript into a running Android app. It enables a user to hook or modify existing functions, along with running new code. Frida requires root access to the Android to run the Frida server. If you do not have root access but the app is marked as debuggable, then [frida can be loaded](https://koz.io/library-injection-for-debuggable-android-apps/) using the debugger. Additionally, I used [11x256's blog](https://11x256.github.io/Frida-hooking-android-part-1/) to setup the python script to interact with Frida and the JavaScript to inject. 
+[Frida](https://frida.re/docs/android/) can inject JavaScript into a running Android app. It enables a user to hook or modify existing functions, along with running new code. Frida requires root access to the Android to run the Frida server. If you do not have root access but the app is marked as debuggable, then [frida can be loaded](https://koz.io/library-injection-for-debuggable-android-apps/) using the debugger. Additionally, I used [11x256's blog](https://11x256.github.io/Frida-hooking-android-part-1/) to setup the python script to interact with Frida and the JavaScript to inject. 
 
+Below is the normal flow from logging in to the decryptMessage function. <br>
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/message_flow.png)
 
-Python code to start TerrorTime and inject the JavaScript.
+Python code to start TerrorTime and inject JavaScript.
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/python.png)
 
 Below is the JavaScript injected into the TerrorTime app; it hooks the decryptMessage to print to the console all messages received. Additionally, it hooks functions called when sending and receiving Stanzas to print them to the console. <br>
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/js.png)
 
-
+New flow after hooking decryptMessage.<br>
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_5/message_flow_modified.png)
 
 By hooking the decryptMessage function, I was able to print out each message the TerrorTime app receives. 
@@ -151,3 +151,5 @@ Things that should work, but I didn't try <br>
 - retrieving the TLS master secret from the Android app.<br>
 
 I was now able to login as Brian and extract his last encrypted message to fulfill the task. 
+
+[Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)

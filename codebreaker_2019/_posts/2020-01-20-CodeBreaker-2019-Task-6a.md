@@ -31,9 +31,9 @@ Below is the format of the message body.
 }
 </pre>
 
-Unfortunately, the recipient was not able to read the message either. I needed to looker deeper into how the message is decrypted. 
+Unfortunately, the recipient was not able to read the message either. I needed to look deeper into how the message is decrypted. 
 
-In Messaging.decryptMessage, after the message is decrypted an internal structure is checked. 
+In the function Messaging.decryptMessage, after the message is decrypted an internal structure is checked. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/check_internal_structure.png)
 
@@ -66,13 +66,17 @@ Example
 </pre>
 
 
-Each user's public key fingerprints in the internal structure are checked to determine if the the message key was encrypted with a corresponding public key. If the internal structure contains a fingerprint that was not used, then TerrorTime treats the message as corrupt and drops it. Interestingly, the app does not check if the public key belongs to the sender or the receiver. Additionally, the message key can be encrypted with a public key that is not recorded in the internal structure. This is why I could send messages without error. 
+Each user's public key fingerprints in the internal structure are checked to determine if the the message key was encrypted with a corresponding public key. If the internal structure contains a fingerprint that was not used, then TerrorTime treats the message as corrupt and drops it. Interestingly, the app does not check if the public key belongs to the sender or the receiver. Additionally, the message key can be encrypted with a public key that is not recorded in the internal structure. This is why I could send messages without error; even though they could not be read. 
 
 Below is the JavaScript I injected into TerrorTime to manipulate the message's internal structure to fix the corrupt issue. The script hooks the Messaging.encryptMessage function and changes the arguments sent to the real function. The client's public key fingerprints list is replaced with the contact's. Now when the contact receives the message, the internal structure only contains fingerprints for their own public keys.
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/encryptMessage.png)
 
-Removing the spoofed user's public key from their VCard is another method to achieve the same result. The second part of the task can be completed two different ways; only one is checked for by the scoring system. The first method is to add the recipient to the spoofed user's block list. This is not a function provided by the TerrorTime app, but is a function of the XMPP server. The second method is to remove the spoofed user's public key from their VCard. Their public key is added back to the server when the user next logs in, which prevents stopping communication permanently. 
+Removing the spoofed user's public key from their VCard is another method to achieve the same result. 
+
+# Preventing Spoofed User From Reading Replies #
+
+The second part of the task can be completed two different ways; only one is checked for by the scoring system. The first method is to add the recipient to the spoofed user's block list. This is not a function provided by the TerrorTime app, but is a function of the XMPP server. The second method is to remove the spoofed user's public key from their VCard. Their public key is added back to the server when the user next logs in, which prevents stopping communication permanently. 
 
 In my opinion, adding the user to a block list is a better method, since it<br>
 - has a more grainier focus,<br>
@@ -99,19 +103,19 @@ Below is the XML representing a PrivacyItem. <br>
 &lt;/item&gt;
 </pre>
 
-Below are picture of the initial and final states of testing the method, along with a gif showing the message being blocked. The Powershell window is running an interactive Python session I used to interactive with Frida. Below are the steps I took:
+Below are pictures of the initial and final states of testing the method, along with a gif showing the message being blocked. The Powershell window is running an interactive Python session I used to interactive with Frida. Below are the steps I took:
 - first sent a message to ensure connectivity,<br>
 - added Zachary to Brian's block list,<br>
 - sent a second message which was blocked,<br>
 - added Zachary to Brian's allow list, and<br>
 - sent a final message that was received.<br>
-- 
+
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/privacy_block_intial.png)
 
 Full video can be found [here](https://youtu.be/nEI1I4CRf0g). 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/block_list_fast.gif)
 
-
+Final state
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/privacy_block_final.png)
 
 # Removing the public key from VCard #
@@ -123,3 +127,5 @@ I used the VCardHelper.savePublicKey function as a template to write JavaScript 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_6/replace_pubkey.png)
 
 Now when a user replies to the spoofed user, the message key is not encrypted with their public key; preventing decryption. Removing the spoofed user's public key from their VCard fixes both problems, prevents the public key fingerprint from being in the messages internal structure and prevents the spoofed user from reading replies. 
+
+[Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)

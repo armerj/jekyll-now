@@ -9,7 +9,7 @@ Task 2 requires you to examine the android app TerrorTime to extract basic metad
 - the SHA256 of the code signing certificate, and <br>
 - the common name of the certificate signer. 
 
-I used the tool jadx to read TerrorTime's AndroidManifest.xml file to extract the permissions. 
+I used the tool jadx to read TerrorTime's AndroidManifest.xml file to determine the permissions. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_2/permissions.png)
 
@@ -21,6 +21,8 @@ Image from [Android Source](https://source.android.com/security/apksigning/v2)
 If the APK is decompressed using a tool like unzip, the certificate data is ignored and it appears as if the app was not signed. Below is the output of jarsigner. 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_2/unsigned_jar.png)
 
-The tool jadx can extract and parse the APK Signature Scheme v2 certificate. 
+The tool jadx can extract and parse the APK Signature Scheme v2 certificate. The common name is listed under subject as CN. The common name for the certificate is dev_terrorTime_711495. The SHA256 is at the bottom under SHA-256 Fingerprint. 
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_2/signature.png)
+
+[Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)

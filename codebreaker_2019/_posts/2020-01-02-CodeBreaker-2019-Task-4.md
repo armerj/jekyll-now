@@ -8,7 +8,7 @@ Task 4 requires you to determine the pin to unlock the cached credentials in the
 - The terrorist cell leader's username and <br>
 - the date the cell is planning an action. <br>
 
-The first step is to analyze the TerrorTime app to determine how the user logs in. I used android studio to emulate a Nexus S android phone running Oreo. Android Virtual Device (AVD) manager, under Tools, can create the devices. To create a device <br>
+The first step is to analyze the TerrorTime app to determine how the user logs in. I used android studio to emulate a Nexus S android phone running Oreo. Android Virtual Device (AVD) manager, under Tools, can create the device. To create a device <br>
 - click "Create Virtual Device",
 - choose type of device,
 - click Next,
@@ -63,8 +63,8 @@ for pin in range(0, 1000000):
 
 I used adb.exe to interact with the phone file system. When I dragged the database file to the phone, it was downloaded to /sdcard/Downloads. 
 
-I used adb.exe to move the file from the Downloads folder to /data/user/0/com.badguy.terrortime/database/clientDB.db. 
-Commands to connect adb.exe to android
+I used adb.exe to move the file from the Downloads folder to /data/user/0/com.badguy.terrortime/database/clientDB.db.<br> 
+Commands to connect adb.exe to Android.
 {% highlight powershell %}
 .\adb.exe root
 .\adb.exe remount
@@ -81,7 +81,7 @@ cp /sdcard/Downloads/clientDB.db database/clientDB.db
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/conn_error.png)
 
-When the codebreaker creators started designed the challenge they set the app to wait for 5 secs before timing out. This was not enough time due to the amount of participants. They released an updated version that waited 30 secs. 
+When the codebreaker creators designed the challenge they set the app to wait for 5 secs before timing out. This was not enough time due to the amount of participants. They released an updated version that waited 30 secs. 
 
 I launched the TerrorTime and input the pin, enabling me to impersonate the terrorist, Kingsley, who has two contacts,
 - Arianna and 
@@ -90,8 +90,9 @@ I launched the TerrorTime and input the pin, enabling me to impersonate the terr
 Clicking on each contact's name retrieves their past messages. 
 
 I figured out that Arianna is the cell leader due to the following messages
-|From|To|Message|Reason
+|From|To|Message|Reason|
 |----|---|------|------|
+
 |Arianna|Kingsley|Is everything set?|She's checking on the status of the op|
 |Arianna|Kingsley|Be grateful for your role in this, Kingsley|She's telling him to be grateful|
 |Kingsley|Arianna|yes ma'am|He is very formal with her|
@@ -100,6 +101,7 @@ I figured out that Arianna is the cell leader due to the following messages
 
 |From|To|Message|Reason|
 |----|---|------|------|
+
 |Kingsley|Devora|want to make sure the ma'am is pleased and confident in us.|Wants to impress Arianna|
 |Kingsley|Devora|see you after New Years Day|Is meeting Devora for the op|
 
@@ -108,6 +110,7 @@ I figured out that Arianna is the cell leader due to the following messages
 I used the following messages to determine the date. 
 |From|To|Message|Reason|
 |----|---|------|------|
+
 |Arianna|Kingsley|Exactly. after the holiday, 1 day|She's telling him when the op is to happen|
 |Kingsley|Devora|see you after New Years Day|Is meeting Devora for the op|
 |Kingsley|Devora|we're to acquire the engagement ring at 1523|Mentions a time for an action|
@@ -117,5 +120,6 @@ I now knew the date of the upcoming operation, 01/02/2020, and the time, 1523. I
 
 determining action. I was only able to determine that wedding usually refers to a big attack (source). 
 
+[Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)
 
 
