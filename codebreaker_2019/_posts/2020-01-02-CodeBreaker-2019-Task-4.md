@@ -96,15 +96,16 @@ Clicking on each contact's name retrieves their past messages.
 </style>
 
 I figured out that Arianna is the cell leader due to the following messages
-|----+---+------+------|
+|----+----+------+------|
 |From|To|Message|Reason|
-|----|---|------|------|
+|----|----|------|------|
 |Arianna|Kingsley|Is everything set?|She's checking on the status of the op|
-|----+---+------+------|
+|----+----+------+------|
 |Arianna|Kingsley|Be grateful for your role in this, Kingsley|She's telling him to be grateful|
-|----+---+------+------|
+|----+----+------+------|
 |Kingsley|Arianna|yes ma'am|He is very formal with her|
-|----+---+------+------|
+|----+----+------+------|
+{: .tablelines}
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/chat_1.png)
 
