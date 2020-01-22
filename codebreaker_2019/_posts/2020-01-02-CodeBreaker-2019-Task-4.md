@@ -89,46 +89,113 @@ I launched the TerrorTime and input the pin, enabling me to impersonate the terr
 
 Clicking on each contact's name retrieves their past messages. 
 
+I figured out that Arianna is the cell leader due to the following messages
 <style>
 .tablelines table, .tablelines td, .tablelines th {
         border: 1px solid black;
         }
 </style>
 
-I figured out that Arianna is the cell leader due to the following messages
-|----+----+------+------|
-|From|To|Message|Reason|
-|----|----|------|------|
-|Arianna|Kingsley|Is everything set?|She's checking on the status of the op|
-|----+----+------+------|
-|Arianna|Kingsley|Be grateful for your role in this, Kingsley|She's telling him to be grateful|
-|----+----+------+------|
-|Kingsley|Arianna|yes ma'am|He is very formal with her|
-|----+----+------+------|
-{: .tablelines}
+<table class="tablelines">
+  <thead>
+    <tr>
+      <th style="text-align: center">From</th>
+      <th style="text-align: center">To</th>
+      <th style="text-align: center">Message</th>
+      <th style="text-align: center">Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Arianna</td>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Is everything set?</td>
+      <td style="text-align: center">She's checking on the status of the op</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Arianna</td>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Be grateful for your role in this, Kingsley</td>
+      <td style="text-align: center">She's telling him to be grateful</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Arianna</td>
+      <td style="text-align: center">yes ma'am</td>
+      <td style="text-align: center">He is very formal with her</td>
+    </tr>
+  </tbody>
+</table>
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/chat_1.png)
 
-|From|To|Message|Reason|
-|----|---|------|------|
+<table class="tablelines">
+  <thead>
+    <tr>
+      <th style="text-align: center">From</th>
+      <th style="text-align: center">To</th>
+      <th style="text-align: center">Message</th>
+      <th style="text-align: center">Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Devora</td>
+      <td style="text-align: center">want to make sure the ma'am is pleased and confident in us.</td>
+      <td style="text-align: center">Wants to impress Arianna</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Devora</td>
+      <td style="text-align: center">see you after New Years Day</td>
+      <td style="text-align: center">Is meeting Devora for the op</td>
+    </tr>
 
-|Kingsley|Devora|want to make sure the ma'am is pleased and confident in us.|Wants to impress Arianna|
-|Kingsley|Devora|see you after New Years Day|Is meeting Devora for the op|
+  </tbody>
+</table>
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/chat_2.png)
 
 I used the following messages to determine the date. 
-|From|To|Message|Reason|
-|----|---|------|------|
-
-|Arianna|Kingsley|Exactly. after the holiday, 1 day|She's telling him when the op is to happen|
-|Kingsley|Devora|see you after New Years Day|Is meeting Devora for the op|
-|Kingsley|Devora|we're to acquire the engagement ring at 1523|Mentions a time for an action|
-
+<table class="tablelines">
+  <thead>
+    <tr>
+      <th style="text-align: center">From</th>
+      <th style="text-align: center">To</th>
+      <th style="text-align: center">Message</th>
+      <th style="text-align: center">Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Arianna</td>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Exactly. after the holiday, 1 day</td>
+      <td style="text-align: center">She's telling him when the op is to happen</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Devora</td>
+      <td style="text-align: center">see you after New Years Day</td>
+      <td style="text-align: center">Is meeting Devora for the op. Mentions the holiday New Year's Day</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Kingsley</td>
+      <td style="text-align: center">Devora</td>
+      <td style="text-align: center">we're to acquire the engagement ring at 1523</td>
+      <td style="text-align: center">Mentions a time for an action</td>
+    </tr>
+  </tbody>
+</table>
 I now knew the date of the upcoming operation, 01/02/2020, and the time, 1523. I used an online epoch converter to convert the date to epoch. 
 01/02/2020 15:23 Z == 1577978580
 
-determining action. I was only able to determine that wedding usually refers to a big attack (source). 
+Through Google, I was only able to determine that wedding usually refers to a big attack. 
+
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/code_word_search.png)
+
+After completing task 7 and decrypting the messages, I can see keywords, such as "acquire" that might indicate its a kidnapping. 
 
 [Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)
 
