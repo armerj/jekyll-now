@@ -89,13 +89,22 @@ I launched the TerrorTime and input the pin, enabling me to impersonate the terr
 
 Clicking on each contact's name retrieves their past messages. 
 
+<style>
+.tablelines table, .tablelines td, .tablelines th {
+        border: 1px solid black;
+        }
+</style>
+
 I figured out that Arianna is the cell leader due to the following messages
+|----+---+------+------|
 |From|To|Message|Reason|
 |----|---|------|------|
-
 |Arianna|Kingsley|Is everything set?|She's checking on the status of the op|
+|----+---+------+------|
 |Arianna|Kingsley|Be grateful for your role in this, Kingsley|She's telling him to be grateful|
+|----+---+------+------|
 |Kingsley|Arianna|yes ma'am|He is very formal with her|
+|----+---+------+------|
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/chat_1.png)
 

@@ -11,11 +11,11 @@ The FICTITIOUS story is that a Terrorist's secure mobile chat application is cov
 This year I was able to complete all eight tasks, along with 3.2% of participants who finished task 1. There was a 132% increase of people who signed up compared to last year but almost the same number of people who finished the first task. 
 
 - 3779 people signed up 2019
-- 1535 finished task 1. 2018 
+- 1535 finished task 1 in 2018 
 - 50 finished task 7
 
 - 2866 people signed up 2018
-- 1536 finished task 0. 2018 
+- 1536 finished task 0 in 2018 
 
 
 # Task 1 - It Begins! - [Getting Started - Part 1] - (Network Traffic Analysis) #
