@@ -195,7 +195,7 @@ Through Google, I was only able to determine that wedding usually refers to a bi
 
 ![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_4/code_word_search.png)
 
-After completing task 7 and decrypting the messages, I can see keywords, such as "acquire" that might indicate its a kidnapping. 
+After completing task 7 and decrypting the messages, I can see keywords, such as "acquire", that might indicate its a kidnapping. 
 
 [Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)
 
