@@ -12,15 +12,15 @@ Task 7 requires you to<br>
 # Analyzing RSA Key Generator #
 I used IDA free to dissemble the key generator. When I first open the program, I found lots of strange function names and it didn't resemble other binaries I have looked at. I used Google to search one of the functions containing the word "clap". [Clap](https://docs.rs/clap/2.33.0/clap/) is used for validating command line arguments to Rust programs. This let me know the program was written in Rust and why I did not recognize anything.I checked the binaries the Android app uses to determine if it was written in a language I was more familiar with. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/keygen_args.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/keygen_args.png)
 
 It was also in rust, but I did see that the Android app uses alg1. I found references to two different algorithms in the binary. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/alg_arg.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/alg_arg.png)
 
 The keygen contains logic to check for the command line argument "algorithm" and choose the algorithm to use based on the value. This argument is not in the help message, and seems to default to alg1. Additionally, there were two functions called RsaAlg1 and RsaAlg2. I decided to compare these functions to determine what was different. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/comparing_alg1_and_alg2.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/comparing_alg1_and_alg2.png)
 
 RsaAlg1 has some additional functionality when generating the primes. Additionally, it only generated one prime and the other prime was derived after manipulating the first prime. I decided that this extra code must be where the backdoor is added, since this function is the one used by the app.
 
@@ -65,7 +65,7 @@ Method 2 enables the primes to be different than each other, but is easily detec
 
 PAP encrypts the prime p and uses this as a starting point for n. The parameter n is chosen to satisfy prime(n / p) == true, and e is chosen normally. This method is less detectable than method 2, but can still be detected. Normal key pairs have primes with lengths that are powers of 2. Since q is not chosen, the length of q can not be set exactly. This results in the length not always being a power of two. Out of 1,000 RSA keys generated with the backdoor, none of them were 2048-bit. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/1000_keys.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/1000_keys.png)
 
 PAP is an interesting method, but has a huge flaw when p is encrypted with RSA. If the prime p is encrypted with RSA key of the same size (half the size of the generate RSA key pair size), then this heavily reduces the security of the resulting RSA key. A better method would be to encrypt prime p with AES since a smaller key size can provide the same level of security, an example is [rsabd.py](https://gist.github.com/ryancdotorg/9bd3873e488740f86ebb). [NIST](https://www.keylength.com/en/4/) places 128-bit AES and 3072-bit RSA at the same security level.
 
@@ -79,13 +79,13 @@ Now, I started digging more into the code by looking for interesting functions. 
 
 The function select_key_params will retrieve 3 embedded strings from the binary based on the requested key size. One string is a public key and the other two strings are base64 encoded r keys. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/select_key_params.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/select_key_params.png)
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/get_embedded_strings.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/get_embedded_strings.png)
 
 I found the easiest method for understanding RsaAlg1 was to color different blocks and make high level notes on each block's functionality. I first colored blocks red that were reached due to an error. Next I colored functions that belonged to the first for loop blue, and highlighted the beginning and end of the second for loop green. I think started writing what each block did based on the functions. Additionally, I named variables that stored results from different functions. This enabled me to start piecing the code's functionality together. In the below images, red lines means check failed and green means check succeeded. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/alg1_flow_marked.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/alg1_flow_marked.png)
 
 The first for loop will<br>
 - generate a prime<br>
@@ -93,7 +93,7 @@ The first for loop will<br>
 - check the result<br>
 - if it does not pass check, then it will generate another prime<br>
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/loop_1.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/loop_1.png)
 
 The second for loop will<br>
 - encrypt XOR'd prime<br>
@@ -103,33 +103,33 @@ The second for loop will<br>
 - checks if result is prime<br>
 - if it is not a prime, then generate a new random value<br>
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/loop_2.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/loop_2.png)
 
 I was able to determine the backdoor scheme they used was a slightly modified PAP by comparing what the code was doing at a high level. It encrypted the prime p and hid it in the public parameter n. PAP was changed to use different values for scrambling prime p before and after encryption. I needed to determine how the XOR values were determined in order to be able to recover prime p from n. Looking at the first XOR, I named the variables to indicate what they were. One was the the result of function generate_safe_prime, the other was unknown. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/xor1.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/xor1.png)
 
 The unknown variable was passed to permute_r_key function and was set with the result from get_r_keys function. 
 
 The get_r_keys function base64 decoded two values, which I believed were likely from the select_key_params function. I now knew the starting values of the r keys, but needed to investigate the permute_r_key function to determine how they are changed. The function permute_r_key hashes the r key as a method to change it. The hash algorithm is either MD5, SH256 or SHA512 depending on the size of the key requested.
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/permute_r_keys.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/permute_r_keys.png)
 
 Interestingly, one of the hash algorithms is MD5 which results in a 128-bit result. This might indicate that the programmer had indicated for the code to generate 256-bit keys, even though the program only accepts requests for sizes 512, 1024, and 2048. How the resulting hash is converted to a vector is a little confusing at first. At first, I thought the r key as hashed and the hash was reversed. The hash value is actually copied to the stack intact, it only appears that it is being placed in reverse since the stack grow up. I do not believe this copying isn't necessarily required when the hash is SHA256 or a single SHA512. This copying is necessarily for when two SHA512 are used and the results are combined. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/hash_to_vector.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/hash_to_vector.png)
 
 I now was able to put the pieces together to determine how the code backdoored the RSA key. Below is python code that duplicates the process. I used the python code to validate my understanding of the keygen code. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/test_understanding.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/test_understanding.png)
 
 Below is the python code to reverse the process.
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/extract_primes.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/extract_primes.png)
 
 I could now extract the prime p for the public value n, except for I did not have the private key to decrypt the value p XOR r_key_1. The embedded RSA keys were too big to attempt to factor or attack directly. I thought maybe they used the same RSA key generator as the one to generate the RSA keys for TerrorTime, which would backdoor the RSA key. Method 3 has an interesting tell, the size of key is very rarely a power of 2. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/checking_key_for_backdoor.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/checking_key_for_backdoor.png)
 
 I used openssl to check the key sizes of the embedded RSA keys. It turns out they backdoored their backdoor. This mean I could recover the private key for the embedded RSA key by using the next smaller embedded key. Ex. To recover the private key for the RSA public key used to encrypt the prime for 2048-bit keys, I needed to recover the private key for the RSA public key used to encrypt the prime for 1024-bit keys. 
 
@@ -137,21 +137,21 @@ I used openssl to check the key sizes of the embedded RSA keys. It turns out the
 
 This meant I could recover all the keys if I could get the private key for a 256-bit RSA key. Unlike the other RSA keys, the 256-bit key was exactly 256 bits meaning it was likely not backdoored. There are publicly available tools to factor 256-bit keys. I used [yafu](https://sites.google.com/site/bbuhrow/home), and it was done in a few minutes. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/factoring_rsa256.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/factoring_rsa256.png)
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/recovered_256_bit_key.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/recovered_256_bit_key.png)
 
 I was then able to recover the private keys for all embedded RSA keys. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/recover_all_keys.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/recover_all_keys.png)
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/backdoored_keys.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/backdoored_keys.png)
 
 # Retrieving All Users' Private Keys #
 
 I modified the JavaScript from task 6b to print print out a users public key, instead of printing and uploading new key. It requested each TerrorTime user's public key. I had to log in a couple users since only it will only retrieve a contact's public key. I then recovered the private key for everyone's public keys, placing each private key into a dictionary with the key's fingerprint as the dictionary key. 
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/private_keys.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/private_keys.png)
 
 I reused the code from task 5 to pull the messages for each TerrorTime user. Next, I decrypted the messages using the below Python code. It will<br>
 - read in the message body,<br>
@@ -160,7 +160,7 @@ I reused the code from task 5 to pull the messages for each TerrorTime user. Nex
 - decrypt symmetric key, and<br>
 - decrypt the message text.<br>
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/decrypt_message_py.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/decrypt_message_py.png)
 
 # Determining Actions #
 
@@ -202,6 +202,6 @@ I was now able to answer the following questions. <br>
   </tbody>
 </table>
 
-![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/Task_7/decrypted_messages_answers.png)
+![_config.yml]({{ site.baseurl }}/images/codebreaker_2019/task_7/decrypted_messages_answers.png)
 
 [Back to Overview](https://armerj.github.io/CodeBreaker-2019-Overview/)
