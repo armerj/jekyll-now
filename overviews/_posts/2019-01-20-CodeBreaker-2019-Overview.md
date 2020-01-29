@@ -13,7 +13,7 @@ This year I was able to complete all eight tasks, along with 3.2% of participant
 - 3779 people signed up 2019
 - 1535 finished task 1 in 2019
 - 50 finished task 7
-
+<br>
 - 2866 people signed up 2018
 - 1536 finished task 0 in 2018 
 
@@ -64,4 +64,4 @@ This task required the analyst to determine a method to allow decryption of all 
 
 This was the final task and the most interesting to me. To ensure that the terrorist leadership could read any messages they put a backdoor in their RSA key generator code. The analyst was required to analyze the recovered keygen program, written in rust, to determine how the backdoor worked. Then, the analyst needed to recover all RSA private keys in order to decrypt messages and determine who the terrorist's are targeting and any future plans. 
 
-Coming Soon!
+[Task 6b Writeup](https://armerj.github.io/CodeBreaker-2019-Task-7/)
