@@ -1,7 +1,7 @@
 ---
 layout: post
 permalink: /Phishing-Doc-Lures/
-title:Phishing Doc Lures
+title: Phishing Doc Lures
 ---
 
 Threat actors commonly use Microsoft Office documents with VBA macros for phishing attacks to infect an unexpecting end user. 
@@ -9,6 +9,8 @@ To get the user to enable macros, the documents commonly contain image lures. So
 - from an older version of office, <br>
 - encrypted, or <br>
 - protected. <br>
+
+# Initial Attempt at OCR #
 
 [InQuest](https://inquest.net/blog/2020/05/12/Detecting-Coercive-Lures-with-OCR) wrote a blog post showing some common lures contained in malicious documents. 
 One of the methods security researchers have attempted to detect documents with these lures, is through [Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition). 
@@ -43,6 +45,8 @@ autumn-magnum“
 {% endhighlight %}
 Unfortunately, OCR was not able to recognize anything. This is likely due to the noise and blurring near the characters. <br>
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/image_close_up.jpg)
+
+# OCR With Pre-processed Image #
 
 My first thought was to use some pre-processing before passing the image to OCR. I have worked on something [similar in the past](https://armerj.github.io/Classification-With-Matlab), and so decided to take a similar approach. 
 I used some pre-processing to separate the image into a two color image.  <br>
@@ -83,6 +87,8 @@ for x in range(i.width):
 i.save('edit_4_colors.jpg')
 {% endhighlight %}
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/all_blue_image.jpg)
+
+# OCR with K-Means Clustering #
 
 Turns out the top 4 colors were all background, just slightly different shades. I needed a way to combine these groups no matter the color. So I turned to clustering. 
 {% highlight python %}
@@ -127,6 +133,7 @@ print('saved clustered image')
 
 I used k-means clustering to group the pixels into 5 clusters. I then went through each cluster setting the pixel to the avg color for that cluster. This reduces the colors in the image by using the actual colors in the image and not an arbitrary threshold. <br>
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/5_cluster_image.jpg)
+![_config.yml]({{ site.baseurl }}/images/ocr_images/compare_online.png)
 {% highlight bash %}
 image_ocr.py 
 ﬂOﬁ'IGBBSS
@@ -137,7 +144,6 @@ mmmmu.umnmu-Iu
 {% endhighlight %}
 Still no luck, but I decided to try 2 clusters, to get the most contrast possible.  <br>
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/2_cluster_image.jpg)
-![_config.yml]({{ site.baseurl }}/images/ocr_images/compare_online.png)
 {% highlight bash %}
 image_ocr.py 
 I] Office 365
@@ -150,6 +156,8 @@ To View Dr edn this document, please (llck "En-bl: edit n5" button
 on me [up yellow bar, and men cnck "Enable :onzem"
 {% endhighlight %}
 YES!!! Progress. It still can't recognize everything but we can clearly see indicators of a lure. Lets see if we can improve this.  <br>
+
+# OCR With Further Improvements #
 
 I looked into maybe trying to use bezier curves to estimate the chars and then redraw them somewhere else and pass that to the OCR. 
 Wasn't able to get anywhere, but I remembered some one on Stack Overflow mentioning to make the image bigger before OCR to help improve the output. 
@@ -191,6 +199,8 @@ MS Office Excel
 To view this content. please click «Enable Editing» from the yellow bar and then
 click «Enable Content»
 {% endhighlight %}
+
+# Results #
 
 I have updated my tool I created to extract images from DOC files. It still needs to be expanded to DOCX and Excel formats. Below is the output from running it on a recent Emotet sample. 
 {% highlight bash %}
