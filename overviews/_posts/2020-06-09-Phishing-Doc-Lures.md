@@ -71,7 +71,7 @@ print 124104/172508.0
 # 0.7194101143135391
 {% endhighlight %}
 
-Turns out that 71%+ is all one color, the light blue. I thought I could just list the highest used colors and only use the top 5.  <br>
+Turns out that 71%+ is all one color, the light blue. I thought I could just list the highest used colors and only use the top 4.  <br>
 {% highlight python %}
 t = [(0, 174, 234), (1, 174, 234), (0, 175, 234), (0, 174, 235)]
 
@@ -125,7 +125,7 @@ imageio.imwrite('clusters.png', c.reshape(*shape).astype(np.uint8))
 print('saved clustered image')
 {% endhighlight %}
 
-I used k-means clustering to group the pixels into 5 clusters. I then went through each cluster setting the pixel to the avg color for that cluster.  <br>
+I used k-means clustering to group the pixels into 5 clusters. I then went through each cluster setting the pixel to the avg color for that cluster. This reduces the colors in the image by using the actual colors in the image and not an arbitrary threshold. <br>
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/5_cluster_image.jpg)
 {% highlight bash %}
 image_ocr.py 
@@ -137,7 +137,7 @@ mmmmu.umnmu-Iu
 {% endhighlight %}
 Still no luck, but I decided to try 2 clusters, to get the most contrast possible.  <br>
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/2_cluster_image.jpg)
-![_config.yml]({{ site.baseurl }}/images/ocr_images/compare_online.jpg)
+![_config.yml]({{ site.baseurl }}/images/ocr_images/compare_online.png)
 {% highlight bash %}
 image_ocr.py 
 I] Office 365
@@ -207,7 +207,7 @@ Suspious words found in extracted text
 ['image sha256 hash is: 07e0449189d63cb013e70a44d60411965cf32e6d5880cb7c2ad64470130b453e']
 {% endhighlight %}
 
-Image from [a1cd9613ecd69483134f09d9794965396f224579feeb6aec58d4c11b76b19344](https://labs.inquest.net/dfi/sha256/a1cd9613ecd69483134f09d9794965396f224579feeb6aec58d4c11b76b19344)
+Below is an example of running OCR on an image with a multicolored background. Image from [Inquest a1cd9613ecd69483134f09d9794965396f224579feeb6aec58d4c11b76b19344](https://labs.inquest.net/dfi/sha256/a1cd9613ecd69483134f09d9794965396f224579feeb6aec58d4c11b76b19344)
 ![_config.yml]({{ site.baseurl }}/images/ocr_images/warning_green_text.jpg)
 {% highlight bash %}
 malspam@malspam:~/malspam_analytics/year=2020/month=04$ python image_ocr.py EX820fYXQAE059F\?format\=jpg 
