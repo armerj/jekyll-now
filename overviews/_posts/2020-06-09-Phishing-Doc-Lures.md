@@ -202,7 +202,7 @@ click «Enable Content»
 
 # Results #
 
-I have updated my tool I created to extract images from DOC files. It still needs to be expanded to DOCX and Excel formats. Below is the output from running it on a recent Emotet sample. 
+I have updated my tool, [doctools](https://github.com/armerj/doctools), created to extract images from DOC files. It still needs to be expanded to DOCX and Excel formats. Below is the output from running it on a recent Emotet sample. 
 {% highlight bash %}
 python extract_img.py -f ../Z_ZG9552902820ZM.doc -o
 most frequent is [254.55600768 254.74310052 254.55694112] (#fefefe)
